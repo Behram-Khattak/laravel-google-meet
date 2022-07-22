@@ -26,10 +26,13 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Add Event Credentials</h5>
+                                        {{-- @isset($googleClient)
+                                            <h5 class="modal-title">{{ $googleClient }}</h5>
+                                        @endisset --}}
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="{{ route('Calendar.store') }}" method="POST" class="p-3">
+                                        <form action="{{ route('Calendar.meeting') }}" method="POST" class="p-3">
                                             @csrf
                                             <div class="form-group m-2">
                                                 <label for="event_name" class="form-label">Event Name</label>
@@ -37,11 +40,11 @@
                                             </div>
                                             <div class="form-group m-2">
                                                 <label for="start_date_time" class="form-label">Event Start DateTime</label>
-                                                <input type="datetime" name="startDateTime" id="start_date_time" class="form-control border-gray-300" required placeholder="Enter Event StartDateTime" aria-describedby="helpId">
+                                                <input type="date" name="startDateTime" id="start_date_time" class="form-control border-gray-300" required placeholder="Enter Event StartDateTime" aria-describedby="helpId">
                                             </div>
                                             <div class="form-group m-2">
                                                 <label for="end_date_time" class="form-label">Event End DateTime</label>
-                                                <input type="datetime" name="endDateTime" id="end_date_time" class="form-control border-gray-300" required placeholder="Enter Event EndDateTime" aria-describedby="helpId">
+                                                <input type="date" name="endDateTime" id="end_date_time" class="form-control border-gray-300" required placeholder="Enter Event EndDateTime" aria-describedby="helpId">
                                             </div>
                                             <div class="form-group m-2 text-center">
                                                 <button type="submit" class="btn btn-lg bg-green-500 text-white hover:bg-green-800">Add</button>

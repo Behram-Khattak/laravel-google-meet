@@ -27,7 +27,7 @@ Route::prefix('Calendar')->group(function () {
     Route::controller(GoogleCalendarController::class)->group(function () {
 
         Route::get('calendar', 'index')->name('Calendar.index');
-        Route::post('calendar_add_event', 'store')->name('Calendar.store');
+        Route::post('calendar_add_event', 'createMeeting')->name('Calendar.meeting');
     });
 });
 

@@ -1,8 +1,0 @@
-{
-    "access_token":"ya29.A0AVA9y1vYlXmUUDXh24S8o2h5dm6egGH_yP_38dBmMp2i1TGaG2EAnt_QABw3nFoEO4eRHiyetGcn9Cq-4QQhmgTgzsECIZtMQM7czTsGiO8qnnzDgQLZEEWZl_4TaeM69ATnz_RzMKmorBrEH6pIursdYLVaYUNnWUtBVEFTQVRBU0ZRRTY1ZHI4M3ZOdHZDZVMzLVBULV9uSlpyd0Npdw0163",
-    "expires_in":3599,
-    "refresh_token":"1\/\/036axxyZWW1vKCgYIARAAGAMSNwF-L9IrerSJ8PiABSo6bnughVZP5jmF7EEFaNoayGk2VQ4u5VLDse8YzNtVp9Rz0xb5Zn4wByU",
-    "scope":"https:\/\/www.googleapis.com\/auth\/calendar.events.readonly",
-    "token_type":"Bearer",
-    "created":1658425446
-}
