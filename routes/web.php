@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoogleCalendarController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,5 +21,14 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+Route::prefix('Calendar')->group(function () {
+
+    Route::controller(GoogleCalendarController::class)->group(function () {
+
+        Route::get('calendar', 'index')->name('Calendar.index');
+        Route::post('calendar_add_event', 'store')->name('Calendar.store');
+    });
+});
 
 require __DIR__.'/auth.php';
