@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Exception;
 use Google\Client;
 use Google\Service\Calendar;
+use Google\Service\Calendar\ConferenceSolution;
 use Google\Service\Calendar\Event;
-use Spatie\GoogleCalendar\Event as SpatieEvent;
 use Illuminate\Support\Str;
 
 class GoogleCalendarController extends Controller
@@ -70,7 +70,8 @@ class GoogleCalendarController extends Controller
 
         // return redirect()->route('Calendar.index', compact('googleClient'));
         $this->client = $client;
-        // dd($client);
+        // dd($this->client);
+        // exit();
     }
 
     public function createMeeting(Request $request)
@@ -92,17 +93,23 @@ class GoogleCalendarController extends Controller
             ),
         ));
 
-        $event = $service->events->insert("behramkttk9@gmail.com", $event);
+        $event = $service->events->insert("primary", $event);
 
         $conference = new \Google\Service\Calendar\ConferenceData();
         $conferenceRequest = new \Google\Service\Calendar\CreateConferenceRequest();
+        $conferenceSolutionKey = new \Google\Service\Calendar\ConferenceSolutionKey();
+        $conferenceSolutionKey->setType("hangoutsMeet");
         $conferenceRequest->setRequestId(Str::orderedUuid());
+        $conferenceRequest->setConferenceSolutionKey($conferenceSolutionKey);
         $conference->setCreateRequest($conferenceRequest);
         $event->setConferenceData($conference);
 
-        $event = $service->events->patch("behram@gmail.com", $event->id, $event, ['conferenceDataVersion' => 1]);
+        $event = $service->events->patch("primary", $event->id, $event, ['conferenceDataVersion' => 1]);
+        // dd($event);
+        // exit();
 
-        return dd($event);
+        return redirect()->route('Calendar.index')
+        ->with('created', 'Meeting Event has been created');
     }
     /**
      * Display a listing of the resource.
