@@ -8,6 +8,12 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                @if (Session::has('created'))
+                    <div class="alert alert-primary" role="alert">
+                        <strong>{{ Session::get('created') }}</strong>
+                        Check your event details by clicking on the event in the calendar.
+                    </div>
+                @endif
                 <div class="p-6 bg-white border-b border-gray-200 m-6 flex justify-between align-middle">
                     Welcom to You'r Google Calendar
                     <div class="add_event_btn">
@@ -20,15 +26,22 @@
                             Add Event
                         </button>
 
+                        @isset($event)
+                            <button
+                            class="bg-green-500 hover:bg-green-800 text-white rounded p-3 focus:ring-4 focus:outline-none focus:ring-green-300"
+                            type="button">
+                            <a href="{{ $event->hangoutLink }}">
+                                Join Event
+                            </a>
+                            </button>
+                        @endisset
+
                         <!-- Modal -->
                         <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Add Event Credentials</h5>
-                                        {{-- @isset($googleClient)
-                                            <h5 class="modal-title">{{ $googleClient }}</h5>
-                                        @endisset --}}
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">

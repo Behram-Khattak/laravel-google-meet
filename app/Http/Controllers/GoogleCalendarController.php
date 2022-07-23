@@ -27,7 +27,7 @@ class GoogleCalendarController extends Controller
         $client->setRedirectUri("http://127.0.0.1:8000/dashboard");
 
         $client->setScopes(Calendar::CALENDAR);
-        $client->setAuthConfig(storage_path("app/google-calendar/service-account-credentials.json"));
+        $client->setAuthConfig(storage_path("app/google-calendar/oauth-credentials.json"));
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
 
@@ -97,19 +97,14 @@ class GoogleCalendarController extends Controller
 
         $conference = new \Google\Service\Calendar\ConferenceData();
         $conferenceRequest = new \Google\Service\Calendar\CreateConferenceRequest();
-        $conferenceSolutionKey = new \Google\Service\Calendar\ConferenceSolutionKey();
-        $conferenceSolutionKey->setType("hangoutsMeet");
         $conferenceRequest->setRequestId(Str::orderedUuid());
-        $conferenceRequest->setConferenceSolutionKey($conferenceSolutionKey);
         $conference->setCreateRequest($conferenceRequest);
         $event->setConferenceData($conference);
 
         $event = $service->events->patch("primary", $event->id, $event, ['conferenceDataVersion' => 1]);
-        // dd($event);
-        // exit();
 
-        return redirect()->route('Calendar.index')
-        ->with('created', 'Meeting Event has been created');
+        return view('dashboard', compact('event'))
+        ->with('created', 'Meeting Event has been created!');
     }
     /**
      * Display a listing of the resource.
@@ -139,23 +134,7 @@ class GoogleCalendarController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'startDateTime' => 'required|date',
-            'endDateTime' => 'required|date'
-        ]);
-        dd($request);
-        // $event = Event::create([
-        //     'name' => 'A new event',
-        //     'startDateTime' => Carbon::now(),
-        //     'endDateTime' => Carbon::now()->addHour(),
-        //  ]);
 
-        //  dd($event);
-        //  exit();
-
-         return redirect()->route('Calendar.index')
-         ->with('created', 'Event has been created on your Google Calendar.');
     }
 
     /**
