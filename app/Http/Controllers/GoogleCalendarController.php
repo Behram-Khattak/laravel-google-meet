@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Exception;
 use Google\Client;
 use Google\Service\Calendar;
-use Google\Service\Calendar\ConferenceSolution;
 use Google\Service\Calendar\Event;
 use Illuminate\Support\Str;
 
