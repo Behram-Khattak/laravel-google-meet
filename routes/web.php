@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\GoogleCalendarController;
+use App\Http\Controllers\MeetingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,12 +22,17 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-Route::prefix('Calendar')->group(function () {
+/**
+ * Routes related to listing calendar events and creating meetings
+ */
+Route::name('calendar.')->group(function () {
 
-    Route::controller(GoogleCalendarController::class)->group(function () {
+    Route::get('calender/events', function () {
+        return view('meeting');
+    })->name('events');
 
-        Route::get('calendar', 'index')->name('Calendar.index');
-        Route::post('calendar_add_event', 'createMeeting')->name('Calendar.meeting');
+    Route::controller(MeetingController::class)->group(function () {
+        Route::post('calendar/event/meeting/create', 'store')->name('meeting.create');
     });
 });
 

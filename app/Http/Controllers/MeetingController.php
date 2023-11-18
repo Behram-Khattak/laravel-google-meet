@@ -10,7 +10,7 @@ use Google\Service\Calendar;
 use Google\Service\Calendar\Event;
 use Illuminate\Support\Str;
 
-class GoogleCalendarController extends Controller
+class MeetingController extends Controller
 {
     public $client;
 
@@ -73,7 +73,33 @@ class GoogleCalendarController extends Controller
         // exit();
     }
 
-    public function createMeeting(Request $request)
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        return view('dashboard');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
     {
         $start = Carbon::now();
         $end = Carbon::now()->addMinutes(10);
@@ -104,36 +130,6 @@ class GoogleCalendarController extends Controller
 
         return view('dashboard', compact('event'))
         ->with('created', 'Meeting Event has been created!');
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        return view('dashboard');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-
     }
 
     /**
