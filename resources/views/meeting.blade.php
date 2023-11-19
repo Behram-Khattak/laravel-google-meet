@@ -1,22 +1,41 @@
 <x-app-layout>
-
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden">
-                @if (Session::has('created'))
-                    <div class="alert alert-primary" role="alert">
-                        <strong>{{ Session::get('created') }}</strong>
-                        Check your event details by clicking on the event in the calendar.
-                    </div>
-                @endif
 
                 <div class="create-meeting-section p-6 capitalize flex flex-col items-center">
 
-                    <form action="#" method="POST"
+                    @if (session('created'))
+                        <div class="p-3 bg-green-500 mb-4 rounded text-white">
+                            <p>{{ session('created') }}</p>
+                        </div>
+
+                    @elseif (session('updated'))
+                        <div class="p-3 bg-blue-500 mb-4 rounded text-white">
+                            <p>{{ session('updated') }}</p>
+                        </div>
+
+                    @elseif (session('deleted'))
+                        <div class="p-3 bg-red-500 mb-4 rounded text-white">
+                            <p>{{ session('deleted') }}</p>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('calendar.meeting.create') }}" method="POST"
                         class="space-y-5 border-gray-500 border p-6 rounded">
                         @csrf
 
-                        <h2 class="font-bold text-3xl text-center">create meet</h2>
+                        @if ($errors->any())
+                            <div class="bg-red-500 text-white p-6 rounded">
+                                <ul>
+                                    @foreach ($errors->all() as $error )
+                                    <li class="list-disc">{{$error}}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <h2 class="font-bold text-3xl text-center">create event</h2>
 
                         {{-- subject --}}
                         <div class="subject-input">
@@ -27,9 +46,15 @@
 
                         {{-- Date Time --}}
                         <div class="dateTime-input">
-                            <x-label class="font-bold" for="DateTime" :value="__('date & time')"/>
+                            <x-label class="font-bold" for="startDateTime" :value="__('start date & time')"/>
 
-                            <x-input id="DateTime" type="datetime-local" name="datetime" />
+                            <x-input id="startDateTime" type="datetime-local" name="startDateTime" />
+                        </div>
+
+                        <div class="dateTime-input">
+                            <x-label class="font-bold" for="endDateTime" :value="__('end date & time')"/>
+
+                            <x-input id="endDateTime" type="datetime-local" name="endDateTime" />
                         </div>
 
                         {{-- Attendees --}}
@@ -37,8 +62,8 @@
                             <x-label class="font-bold" for="Attendees" :value="__('attendees')"/>
 
                             <div class="flex space-x-5">
-                                <x-input id="" type="text" placeholder="Attendee 1" />
-                                <x-input id="" type="text" placeholder="Attendee 2" />
+                                <x-input id="" type="email" name="attendees[]" placeholder="Attendee 1" />
+                                <x-input id="" type="email" name="attendees[]" placeholder="Attendee 2" />
                             </div>
                         </div>
 
@@ -48,20 +73,9 @@
                             </x-button>
                         </div>
                     </form>
-
-
-                    {{-- @isset($event)
-                        <button
-                        class="bg-green-500 hover:bg-green-800 text-white rounded p-3 focus:ring-4 focus:outline-none focus:ring-green-300"
-                        type="button">
-                            <a href="{{ $event->hangoutLink }}">
-                                Join Event
-                            </a>
-                        </button>
-                    @endisset --}}
                 </div>
 
-                <div class="list-meetings bg-white rounded-lg p-10">
+                <div class="list-meetings rounded-lg p-10 border border-gray-800">
                     <div class="block overflow-x-auto">
                         <table class="items-center bg-transparent w-full border-collapse">
                           <thead>
@@ -70,7 +84,10 @@
                                             subject
                                           </th>
                             <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                            date & time
+                                            start date & time
+                                          </th>
+                            <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                                            end date & time
                                           </th>
                              <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                                             attendees
@@ -82,27 +99,45 @@
                           </thead>
 
                           <tbody>
-                            <tr>
-                                <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                                    interview
-                                </th>
-                                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 ">
-                                    2023-11-18 11:49:54
-                                </td>
-                                <td class="border-t-0 px-6 align-center border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
-                                    2
-                                </td>
-                                <td class="capitalize border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
-                                    <a href="#" class="bg-blue-600 text-white py-2 px-3 rounded">edit</a>
-                                    <a href="#" class="bg-red-600 text-white py-2 px-3 rounded">delete</a>
-                                </td>
-                            </tr>
+                            @foreach ($events as $event)
+                                <tr class="border-b border-gray-800">
+                                    <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-left text-blueGray-700 ">
+                                        {{ $event->subject }}
+                                    </th>
+                                    <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 ">
+                                        {{ $event->startDateTime }}
+                                    </td>
+                                    <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 ">
+                                        {{ $event->endDateTime }}
+                                    </td>
+                                    <td class="border-t-0 px-6 align-center border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
+                                        @foreach ($event->attendees as $value)
+                                            {{ $value }} <br>
+                                        @endforeach
+                                    </td>
+                                    <td class="capitalize border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4">
+                                        <a href="{{ route('calendar.meeting.show', $event->id) }}"
+                                            class="bg-blue-600 text-white py-2 px-3 rounded"
+                                            id="openModal">edit</a>
+
+                                        <a href="{{ route('calendar.meeting.delete', $event->id) }}"
+                                            class="bg-red-600 text-white py-2 px-3 rounded">delete</a>
+                                    </td>
+                                </tr>
+                            @endforeach
                           </tbody>
 
                         </table>
+                        <div class="pagination mt-5">
+                            {{ $events->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+@section('scripts')
+{{--  --}}
+@endsection
 </x-app-layout>

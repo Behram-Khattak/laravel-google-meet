@@ -2,75 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Exception;
 use Google\Client;
 use Google\Service\Calendar;
 use Google\Service\Calendar\Event;
-use Illuminate\Support\Str;
 
 class MeetingController extends Controller
 {
     public $client;
 
-    // public $start;
-    // public $end;
-    // public $meetingId;
-
     public function __construct()
     {
-        $client = new Client();
+        $client = new Client(); // Google Client
 
-        $client->setApplicationName("Cognimeet");
-        $client->setRedirectUri("http://127.0.0.1:8000/dashboard");
+        $service_account_token = base_path('/app/Credentials/meeting-credentials.json');
 
+        $client->setAuthConfig($service_account_token);
         $client->setScopes(Calendar::CALENDAR);
-        $client->setAuthConfig(storage_path("app/google-calendar/oauth-credentials.json"));
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
 
-        // Load previously authorized token from a file, if it exists.
-        // The file token.json stores the user's access and refresh tokens, and is
-        // created automatically when the authorization flow completes for the first
-        // time.
-        if (file_exists(storage_path("app/google-calendar/oauth-token.json"))) {
-            $accessToken = json_decode(file_get_contents(storage_path("app/google-calendar/oauth-token.json")), true);
-            $client->setAccessToken($accessToken);
-        }
-
-        // If there is no previous token or it's expired.
-        if ($client->isAccessTokenExpired()) {
-            // Refresh the token if possible, else fetch a new one.
-            if ($client->getRefreshToken()) {
-                $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-            } else {
-                // Request authorization from the user.
-                $authUrl = $client->createAuthUrl();
-                printf("Open the following link in your browser:\n%s\n", $authUrl);
-                print 'Enter verification code: ';
-                $authCode = trim(fgets(STDIN));
-
-                // Exchange authorization code for an access token.
-                $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
-                $client->setAccessToken($accessToken);
-
-                // Check to see if there was an error.
-                if (array_key_exists('error', $accessToken)) {
-                    throw new Exception(join(', ', $accessToken));
-                }
-            }
-            // Save the token to a file.
-            if (!file_exists(dirname(storage_path("app/google-calendar/oauth-token.json")))) {
-                mkdir(dirname(storage_path("app/google-calendar/oauth-token.json")), 0700, true);
-            }
-            file_put_contents(storage_path("app/google-calendar/oauth-token.json"), json_encode($client->getAccessToken()));
-        }
-
-        // return redirect()->route('Calendar.index', compact('googleClient'));
         $this->client = $client;
-        // dd($this->client);
-        // exit();
     }
 
     /**
@@ -97,39 +49,39 @@ class MeetingController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return int event_id
      */
-    public function store(Request $request)
+    public function createEvent(Request $request)
     {
-        $start = Carbon::now();
-        $end = Carbon::now()->addMinutes(10);
+        $service_calender = new Calendar($this->client);  // Google Service Calendar
 
-        $service = new Calendar($this->client);
+        $event_calender = new Event([ // Google Service Calendar Event
+            'summary' => $request->subject,
+            'start' => [
+                'dateTime' => $request->startDateTime.':00',
+                'timeZone' => 'Asia/Karachi',
+            ],
+            'end' => [
+                'dateTime' => $request->endDateTime.':00',
+                'timeZone' => 'Asia/Karachi',
+            ],
+            // 'attendees' => [
+            //     ['email' => $request->attendees[0]],
+            //     ['email' => $request->attendees[1]],
+            // ],
+            // 'maxAttendees' => 2,
+        ]);
 
-        $event = new Event(array(
-            'summary' => 'my meeting',
-            'start' => array(
-                'dateTime' => $start->format(\DateTime::RFC3339),
-                'timeZone' => 'Asia/Bangkok',
-            ),
-            'end' => array(
-                'dateTime' => $end->format(\DateTime::RFC3339),
-                'timeZone' => 'Asia/Bangkok',
-            ),
-        ));
+        /**
+         * Calendar id set to my gmail account.
+         */
+        $calender_id = config('app.google_calendar_id');
 
-        $event = $service->events->insert("primary", $event);
+        $event = $service_calender->events->insert($calender_id, $event_calender);
 
-        $conference = new \Google\Service\Calendar\ConferenceData();
-        $conferenceRequest = new \Google\Service\Calendar\CreateConferenceRequest();
-        $conferenceRequest->setRequestId(Str::orderedUuid());
-        $conference->setCreateRequest($conferenceRequest);
-        $event->setConferenceData($conference);
+        $event_id = $event->getId();
 
-        $event = $service->events->patch("primary", $event->id, $event, ['conferenceDataVersion' => 1]);
-
-        return view('dashboard', compact('event'))
-        ->with('created', 'Meeting Event has been created!');
+        return $event_id;
     }
 
     /**
@@ -158,22 +110,50 @@ class MeetingController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return int updated_event_id
      */
-    public function update(Request $request, $id)
+    public function updateEvent(Request $request, $id)
     {
-        //
+        $service_calender = new Calendar($this->client);  // Google Service Calendar
+
+        $event_calender = new Event([ // Google Service Calendar Event
+            'summary' => $request->subject,
+            'start' => [
+                'dateTime' => $request->startDateTime.':00',
+                'timeZone' => 'Asia/Karachi',
+            ],
+            'end' => [
+                'dateTime' => $request->endDateTime.':00',
+                'timeZone' => 'Asia/Karachi',
+            ],
+            // 'attendees' => [
+            //     ['email' => $request->attendees[0]],
+            //     ['email' => $request->attendees[1]],
+            // ],
+            // 'maxAttendees' => 2,
+        ]);
+
+        /**
+         * Calendar id set to my gmail account.
+         */
+        $calender_id = config('app.google_calendar_id');
+
+        $update_event = $service_calender->events->update($calender_id, $id, $event_calender);
+
+        $updated_event_id = $update_event->getId();
+
+        return $updated_event_id;
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroyEvent($deleted_event_id)
     {
-        //
+        $service_calender = new Calendar($this->client);  // Google Service Calendar
+
+        $calender_id = config('app.google_calendar_id');
+
+        $service_calender->events->delete($calender_id, $deleted_event_id);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\MeetingController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,14 +26,14 @@ Route::get('/dashboard', function () {
 /**
  * Routes related to listing calendar events and creating meetings
  */
-Route::name('calendar.')->group(function () {
+Route::prefix('calendar')->name('calendar.')->group(function () {
 
-    Route::get('calender/events', function () {
-        return view('meeting');
-    })->name('events');
-
-    Route::controller(MeetingController::class)->group(function () {
-        Route::post('calendar/event/meeting/create', 'store')->name('meeting.create');
+    Route::controller(DatabaseController::class)->group(function () {
+        Route::get('/events', 'index')->name('events');
+        Route::post('/event/meeting/create', 'store')->name('meeting.create');
+        Route::get('/event/meeting/show/{id}', 'show')->name('meeting.show');
+        Route::put('/event/meeting/update/{id}', 'update')->name('meeting.update');
+        Route::get('/event/meeting/delete/{id}', 'destroy')->name('meeting.delete');
     });
 });
 

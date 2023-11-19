@@ -16,7 +16,6 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -142,6 +141,8 @@ return [
         'driver' => 'file',
         // 'store'  => 'redis',
     ],
+
+    'google_calendar_id' => env('GOOGLE_CALENDAR_ID'),
 
     /*
     |--------------------------------------------------------------------------

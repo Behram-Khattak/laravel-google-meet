@@ -15,6 +15,16 @@
                     </a>
                 </div>
 
+                @isset($event_calender)
+                    <button
+                    class="bg-green-500 hover:bg-green-800 text-white rounded p-3 focus:ring-4 focus:outline-none focus:ring-green-300"
+                    type="button">
+                        <a href="{{ $event_calender->hangoutLink }}">
+                            Join Event
+                        </a>
+                    </button>
+                @endisset
+
                 <iframe
                     src="https://calendar.google.com/calendar/embed?src={{ auth()->user()->email }}&ctz=UTC"
                     style="border: 0"
