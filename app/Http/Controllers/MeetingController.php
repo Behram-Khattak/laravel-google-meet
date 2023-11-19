@@ -15,7 +15,7 @@ class MeetingController extends Controller
     {
         $client = new Client(); // Google Client
 
-        $service_account_token = base_path('/app/Credentials/meeting-credentials.json');
+        $service_account_token = public_path('/Credentials/meeting-credentials.json');
 
         $client->setAuthConfig($service_account_token);
         $client->setScopes(Calendar::CALENDAR);
@@ -65,11 +65,11 @@ class MeetingController extends Controller
                 'dateTime' => $request->endDateTime.':00',
                 'timeZone' => 'Asia/Karachi',
             ],
-            // 'attendees' => [
-            //     ['email' => $request->attendees[0]],
-            //     ['email' => $request->attendees[1]],
-            // ],
-            // 'maxAttendees' => 2,
+            'attendees' => [
+                ['email' => $request->attendees[0]],
+                ['email' => $request->attendees[1]],
+            ],
+            'maxAttendees' => 2,
         ]);
 
         /**
@@ -126,11 +126,11 @@ class MeetingController extends Controller
                 'dateTime' => $request->endDateTime.':00',
                 'timeZone' => 'Asia/Karachi',
             ],
-            // 'attendees' => [
-            //     ['email' => $request->attendees[0]],
-            //     ['email' => $request->attendees[1]],
-            // ],
-            // 'maxAttendees' => 2,
+            'attendees' => [
+                ['email' => $request->attendees[0]],
+                ['email' => $request->attendees[1]],
+            ],
+            'maxAttendees' => 2,
         ]);
 
         /**
