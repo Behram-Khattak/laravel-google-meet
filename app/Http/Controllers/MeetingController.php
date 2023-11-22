@@ -55,6 +55,12 @@ class MeetingController extends Controller
     {
         $service_calender = new Calendar($this->client);  // Google Service Calendar
 
+        /**
+         * The attendees cannot be added to the event because of  the service account.
+         * Domain wide delegation of authority should be enabled for service accounts.
+         * While i do not have google workspace account so, that's why the Domain wide
+         * delegation is not enabled, and same issue with creating conference (Google Meet video call).
+         */
         $event_calender = new Event([ // Google Service Calendar Event
             'summary' => $request->subject,
             'start' => [
@@ -65,11 +71,6 @@ class MeetingController extends Controller
                 'dateTime' => $request->endDateTime.':00',
                 'timeZone' => 'Asia/Karachi',
             ],
-            'attendees' => [
-                ['email' => $request->attendees[0]],
-                ['email' => $request->attendees[1]],
-            ],
-            'maxAttendees' => 2,
         ]);
 
         /**
@@ -77,7 +78,7 @@ class MeetingController extends Controller
          */
         $calender_id = config('app.google_calendar_id');
 
-        $event = $service_calender->events->insert($calender_id, $event_calender);
+        $event = $service_calender->events->insert($calender_id, $event_calender, [ 'conferenceDataVersion' => 1 ]);
 
         $event_id = $event->getId();
 
@@ -126,11 +127,6 @@ class MeetingController extends Controller
                 'dateTime' => $request->endDateTime.':00',
                 'timeZone' => 'Asia/Karachi',
             ],
-            'attendees' => [
-                ['email' => $request->attendees[0]],
-                ['email' => $request->attendees[1]],
-            ],
-            'maxAttendees' => 2,
         ]);
 
         /**
